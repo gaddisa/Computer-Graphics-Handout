@@ -1,0 +1,58 @@
+//programmed by Gaddisa Olani, UTM, 20015
+#include <GL/glut.h>
+	void house() {
+    	glClearColor(1.0, 1.0, 1.0, 0.0); // white background
+    	glColor3f(1,0,0); // red foreground
+    	  	// establish a coordinate system for the image
+    	glMatrixMode(GL_PROJECTION);
+    	glLoadIdentity();
+    	gluOrtho2D(0.0, 640.0, 0.0, 480.0);//specifies the coordinate system OpenGL assumes as it draws the
+		//final image and how the image gets mapped to the screen
+	}	
+
+	
+	void display()
+	{
+    	glClear(GL_COLOR_BUFFER_BIT); 
+    	glBegin(GL_LINE_LOOP); 
+      	glVertex2i(40,40);
+      	glVertex2i(40,90);
+      	glVertex2i(70,120);
+      	glVertex2i(100,90);
+      	glVertex2i(100,40);
+    	glEnd(); 	
+      	     		    	
+    	glBegin(GL_LINE_STRIP); 
+      	glVertex2i(50,100);
+      	glVertex2i(50,120);
+      	glVertex2i(60,120);
+      	glVertex2i(60,110);
+      		glEnd();
+      	glBegin(GL_LINE_STRIP); 
+      	glVertex2i(60,40);
+      	glVertex2i(60,65);
+      	glVertex2i(80,65);
+      	glVertex2i(80,40);
+         	glEnd();
+         	glBegin(GL_LINE_LOOP); 
+      	glVertex2i(90,55);
+      	glVertex2i(90,60);
+      	glVertex2i(95,60);
+      	glVertex2i(95,55);
+         	glEnd();
+    	glFlush(); 
+	}
+
+	
+	int main()
+	{
+    	
+    	glutInitWindowSize(640,480); 
+    	
+    	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    	glutCreateWindow("House design");
+    	glutDisplayFunc(display); 
+    	house(); 
+    	glutMainLoop(); 
+    	return 0;
+	}

@@ -1,0 +1,912 @@
+1.
+#include <GL/glut.h>
+#include <stdlib.h>
+static GLfloat spin = 0.0;
+void init(void)
+{
+glClearColor (0.0, 0.0, 0.0, 0.0);
+}
+void display(void)
+{
+glClear(GL_COLOR_BUFFER_BIT);
+glPushMatrix();
+glRotatef(spin, 0.0, 0.0, 1.0);
+glColor3f(1.0, 1.0, 1.0);
+glRectf(-25.0, -25.0, 25.0, 25.0);
+glPopMatrix();
+glutSwapBuffers();
+}
+void spinDisplay(void)
+{
+spin = spin + 2.0;
+if (spin > 360.0)
+spin = spin - 360.0;
+glutPostRedisplay();
+}
+void reshape(int w, int h)
+{glViewport (0, 0,  w,  h);//default callback for glViewport(0,0,width,height)
+glMatrixMode(GL_PROJECTION);
+glLoadIdentity();
+glOrtho(-50.0, 50.0, -50.0, 50.0, -1.0, 1.0);//(left, right,bottom, top,nearVal, farVal)
+glMatrixMode(GL_MODELVIEW);
+glLoadIdentity();
+}
+void mouse(int button, int state, int x, int y)
+{
+switch (button) {
+case GLUT_LEFT_BUTTON:
+if (state == GLUT_DOWN)
+glutIdleFunc(spinDisplay);
+break;
+case GLUT_MIDDLE_BUTTON:
+if (state == GLUT_DOWN)
+glutIdleFunc(NULL);
+break;
+default:
+break;
+}
+}
+/*
+* Request double buffer display mode.
+* Register mouse input callback functions
+*/
+int main()
+{
+
+glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
+glutInitWindowSize (250, 250);
+glutInitWindowPosition (100, 100);
+glutCreateWindow ("animation");
+init ();
+glutDisplayFunc(display);
+glutReshapeFunc(reshape);
+glutMouseFunc(mouse);
+glutMainLoop();
+
+}
+/*i)   The glRectf(x1, y1, x2, y2) function is exactly equivalent to the following sequence:
+    change and look the effect
+    glBegin(GL_POLYGON);
+
+    glVertex2(x1, y1);
+
+    glVertex2(x2, y1);
+
+    glVertex2(x2, y2);
+
+    glVertex2(x1, y2);
+    
+    glEnd( );
+    
+ii).change the spin value with any angle
+iii). chang the spin incresement with 45 and look the effect*/
+
+2.
+
+#include <GL/glut.h>
+char message[] = "COMPUTER GRAPHICS.";
+int angle  =  0;
+
+void idle()
+{
+  angle += 2;
+  glutPostRedisplay();
+}
+void display()
+{
+  glClearColor(0.0, 0.0, 0.3, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glColor3f(1.0, 1.0, 1.0);  
+  glLineWidth(3.0);
+  
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(0, 2000, 0, 2000);
+  
+  glPushMatrix();
+   
+  glTranslatef(900,900,0); //Translates the character object with its axis of rotation
+  glRotatef(angle, 0.0, 0.0, 1.0);//Rotates the characters about z-axis 
+                            //by angle degree
+  glTranslatef(-700,0,0); //translates the character object 
+                      //by 700 unit to the -ve x-axis
+  for (int i = 0; i < strlen(message); i++) {
+    glutStrokeCharacter(GLUT_STROKE_ROMAN, message[i]);
+  }
+  
+  glPopMatrix(); 
+  glutSwapBuffers(); 
+}
+int main()
+{
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+  glutInitWindowSize(640, 480);
+  glutCreateWindow("stroke font");
+  glutDisplayFunc(display);
+
+  glutIdleFunc(idle);
+  glutMainLoop();
+}
+
+
+3.Gassignment
+i)	change the rotated message specified by your group name
+ 	and ignore the first character of your rotated  message
+	-the rotated message shoud be rotated at an angle of 30 degree
+ii). modified your program to display the character specified by
+	only odd index of the array.
+ 
+
+ 
+#include <GL/glut.h>
+#include <stdlib.h>
+
+static int leftFirst = GL_TRUE;
+
+/*  Initialize alpha blending function.
+ */
+static void init(void)
+{
+   glEnable (GL_BLEND);
+   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glShadeModel (GL_FLAT);
+   glClearColor (0.0, 0.0, 0.0, 0.0);
+}
+
+static void drawLeftTriangle(void)
+{
+   /* draw yellow triangle on LHS of screen */
+
+   glBegin (GL_TRIANGLES);
+      glColor4f(1.0, 1.0, 0.0, 0.75);
+      glVertex3f(0.1, 0.9, 0.0); 
+      glVertex3f(0.1, 0.1, 0.0); 
+      glVertex3f(0.7, 0.5, 0.0); 
+   glEnd();
+}
+
+static void drawRightTriangle(void)
+{
+   /* draw cyan triangle on RHS of screen */
+
+   glBegin (GL_TRIANGLES);
+      glColor4f(0.0, 1.0, 1.0, 0.75);
+      glVertex3f(0.9, 0.9, 0.0); 
+      glVertex3f(0.3, 0.5, 0.0); 
+      glVertex3f(0.9, 0.1, 0.0); 
+   glEnd();
+}
+
+void display(void)
+{
+   glClear(GL_COLOR_BUFFER_BIT);
+
+   if (leftFirst) {
+      drawLeftTriangle();
+      drawRightTriangle();
+   }
+   else {
+      drawRightTriangle();
+      drawLeftTriangle();
+   }
+
+   glFlush();
+}
+
+void reshape(int w, int h)
+{
+   glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   if (w <= h) 
+      gluOrtho2D (0.0, 1.0, 0.0, 1.0*(GLfloat)h/(GLfloat)w);
+   else 
+      gluOrtho2D (0.0, 1.0*(GLfloat)w/(GLfloat)h, 0.0, 1.0);
+}
+
+void keyboard(unsigned char key, int x, int y)
+{
+   switch (key) {
+      case 't':
+      case 'T':
+         leftFirst = !leftFirst;
+         glutPostRedisplay();	
+         break;
+      case 27:  /*  Escape key  */
+         exit(0);
+         break;
+      default:
+         break;
+   }
+}
+
+/*  Main Loop
+ *  Open window with initial window size, title bar, 
+ *  RGBA display mode, and handle input events.
+ */
+int main(int argc, char** argv)
+{
+   glutInit(&argc, argv);
+   glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
+   glutInitWindowSize (200, 200);
+   glutCreateWindow (argv[0]);
+   init();
+   glutReshapeFunc (reshape);
+   glutKeyboardFunc (keyboard);
+   glutDisplayFunc (display);
+   glutMainLoop();
+   return 0;
+}
+
+3.
+/*Chapter-3
+* Example 5 of 6
+* 3D - sphere model
+*/
+
+#include <stdio.h>
+#include <math.h>
+#include <GL/glut.h>
+
+int depth=6;
+float angle=1;
+
+float vdata[6][3] = {{1, 0, 0}, 
+                     {0, 1, 0}, 
+                     {0, 0, 1},
+	                 {-1, 0, 0}, 
+                     {0, -1, 0}, 
+                     {0, 0, -1}
+                    };
+void normalize(float v[3]) {
+	float d = sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+	v[0] /= d;	v[1] /= d;	v[2] /= d;
+}
+void subdivideSphere(float *v1, float *v2, float *v3, long depth)
+{
+	float v12[3], v23[3], v31[3];
+	if (depth == 0) {
+		glColor3f(v1[0]*v1[0], v2[1]*v2[1], v3[2]*v3[2]);
+	glBegin(GL_TRIANGLES);
+		glVertex3fv(v1);
+		glVertex3fv(v2);
+		glVertex3fv(v3);
+	glEnd();
+	
+		return;
+	}
+	for (int i = 0; i < 3; i++) {
+		v12[i] = v1[i]+v2[i];
+		v23[i] = v2[i]+v3[i];
+		v31[i] = v1[i]+v3[i];
+	}
+	normalize(v12);
+	normalize(v23);
+	normalize(v31);
+	subdivideSphere(v1, v12, v31, depth - 1);
+	subdivideSphere(v2, v23, v12, depth - 1);
+	subdivideSphere(v3, v31, v23, depth - 1);
+	subdivideSphere(v23,v23, v31,  depth - 1);
+}
+void drawSphere()
+{
+	subdivideSphere(vdata[0], vdata[1], vdata[2], 5);
+	subdivideSphere(vdata[0], vdata[2], vdata[4], 5);
+    subdivideSphere(vdata[0], vdata[4], vdata[5], 5);
+	subdivideSphere(vdata[0], vdata[5], vdata[1], 5);
+
+	subdivideSphere(vdata[3], vdata[1], vdata[5], 5);
+	subdivideSphere(vdata[3], vdata[5], vdata[4], 5);
+	subdivideSphere(vdata[3], vdata[4], vdata[2], 5);
+	subdivideSphere(vdata[3], vdata[2], vdata[1], 5);
+}
+void display()
+{ 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor (0.0, 0.0, 0.4, 1.0);
+    
+ 	glEnable(GL_DEPTH_TEST);// enables depth test for hidden surface removal
+ 	
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    glOrtho(-300, 300, -300, 300, -300, 300); 
+	glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
+    
+    angle++;
+        glPushMatrix();
+		glRotatef(angle, 0.0, 1.0, 0.0); 
+		glTranslatef(10, 0.0, 0.0);
+		glScalef(200,200,200);
+		drawSphere();
+     	glPopMatrix();
+     	
+	glutSwapBuffers();
+}
+int main(){   
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(600, 600);
+    glutCreateWindow("Example: press SPACE & another key");
+
+    glutDisplayFunc(display);
+    glutIdleFunc(display);
+    glutMainLoop();
+}
+
+4.
+
+/*chapter-3
+*Example 6 of 6
+*a simple solar system 
+*/
+
+#include <math.h>
+#include <GL/glut.h>
+
+int Height=600, Width=600;
+int depth=4;
+float angle=2;
+
+float vdata[6][3] = {
+	{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0},
+	{-1.0, 0.0, 0.0}, {0.0, -1.0, 0.0}, {0.0, 0.0, -1.0}
+};
+void normalize(float v[3]) {
+	float d = sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+
+	v[0] /= d;	v[1] /= d;	v[2] /= d;
+}
+void subdivideSphere(float *v1, float *v2, float *v3, long depth)
+{
+	float v12[3], v23[3], v31[3];
+	int i;
+
+	if (depth == 0) {
+		glColor3f(v1[0]*v1[0], v2[1]*v2[1], v3[2]*v3[2]);
+		
+	glBegin(GL_TRIANGLES);
+		glVertex3fv(v1);
+		glVertex3fv(v2);
+		glVertex3fv(v3);
+	glEnd();
+		return;
+	}
+	for (i = 0; i < 3; i++) {
+		v12[i] = v1[i]+v2[i];
+		v23[i] = v2[i]+v3[i];
+		v31[i] = v3[i]+v1[i];
+	}
+	normalize(v12);
+	normalize(v23);
+	normalize(v31);
+	subdivideSphere(v1, v12, v31, depth - 1);
+	subdivideSphere(v2, v23, v12, depth - 1);
+	subdivideSphere(v3, v31, v23, depth - 1);
+	subdivideSphere(v12, v23, v31, depth - 1);
+}
+void drawSphere(void)
+{
+	subdivideSphere(vdata[0], vdata[1], vdata[2], depth);
+	subdivideSphere(vdata[0], vdata[2], vdata[4], depth);
+	subdivideSphere(vdata[0], vdata[4], vdata[5], depth);
+	subdivideSphere(vdata[0], vdata[5], vdata[1], depth);
+
+	subdivideSphere(vdata[3], vdata[1], vdata[5], depth);
+	subdivideSphere(vdata[3], vdata[5], vdata[4], depth);
+	subdivideSphere(vdata[3], vdata[4], vdata[2], depth);
+	subdivideSphere(vdata[3], vdata[2], vdata[1], depth);
+}
+void drawSolar(float angle1, float angle2, float distance1, float angle3)
+{
+   glPushMatrix();
+		glRotatef(angle, 0.0, 1.0, 0.0); // rotating around the "sun";
+		glTranslatef(20, 0.0, 0.0);
+		glScalef(200,200,200);
+		drawSphere();
+		glPopMatrix();
+	glPopMatrix();
+ }
+void display(void)
+{ 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	angle+=0.5;
+	drawSolar(150, angle, 50, angle);
+
+	glutSwapBuffers();
+}
+void Reshape(int w, int h)
+{
+    glClearColor (0.0, 0.0, 0.0, 1.0);
+
+	// enables depth test for hidden surface removal
+ 	glEnable(GL_DEPTH_TEST);
+
+	Width = w; Height = h; 
+
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    glOrtho(-300, 300, -300, 300, -600, 600); 
+
+	glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
+}
+
+int main()
+{
+
+ 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(600, 600);
+    glutCreateWindow("3D-solid sphere");
+
+    glutReshapeFunc(Reshape); 
+    glutDisplayFunc(display);
+    glutIdleFunc(display);
+
+    glutMainLoop();
+}
+
+
+
+
+
+5.
+/*Chapter-3 
+* Example 1 of 6
+* Rotation,Translation 
+*/
+
+#include <GL/glut.h>
+char message[] = "GLUT means OpenGL.";
+int angle  =  0;
+
+void idle()
+{
+  angle += 2;
+  glutPostRedisplay();
+}
+void display()
+{
+  glClearColor(0.0, 0.0, 0.3, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+  glColor3f(1.0, 1.0, 1.0);  
+  glLineWidth(3.0);
+  
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(0, 2000, 0, 2000);
+  
+  glPushMatrix();
+   
+  glTranslatef(900,900,0); //Translates the character object with its axis of rotation
+  glRotatef(angle, 0.0, 0.0, 1.0);//Rotates the characters about z-axis 
+                            //by angle degree
+  glTranslatef(-700,0,0); //translates the character object 
+                      //by 700 unit to the -ve x-axis
+  for (int i = 0; i < strlen(message); i++) {
+    glutStrokeCharacter(GLUT_STROKE_ROMAN, message[i]);
+  }
+  
+  glPopMatrix(); 
+  glutSwapBuffers(); 
+}
+int main()
+{
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+  glutInitWindowSize(640, 480);
+  glutCreateWindow("stroke font");
+  glutDisplayFunc(display);
+
+  glutIdleFunc(idle);
+  glutMainLoop();
+}
+
+6.
+
+#include<GL/Glut.h> //includes the opengl, glu, and glut header files
+#include<stdlib.h> //includes the standard library header file
+
+int x[50],y[50],i=1,j=1;  
+
+void mouse(int button, int state, int mousex, int mousey)
+{
+    if(button==GLUT_LEFT_BUTTON && state==GLUT_UP)
+    {
+
+     
+        x[i] = mousex;
+        y[i] = 480-mousey;
+        
+        i++;
+        }
+            
+   else if(button==GLUT_RIGHT_BUTTON && state==GLUT_DOWN)//undo(clear)the drawing
+           {
+    glClearColor(1, 1, 1, 0); 
+    glClear(GL_COLOR_BUFFER_BIT);  
+     }
+glutPostRedisplay();
+     }
+        
+void display(void)
+{  
+    glColor3f(1,0,0); // sets the current drawing (foreground) color to blue 
+    glPointSize(2); // sets the size of points to be drawn (in pixels)
+   
+    glMatrixMode(GL_PROJECTION);// sets the current matrix to projection
+    glLoadIdentity();//multiply the current matrix by identity matrix
+    gluOrtho2D(0.0, 640.0, 0.0, 480.0);//sets the parallel(orthographic) projection of the full frame buffer 
+
+  for (int k=0;k<=i;k++)
+{
+
+       glBegin(GL_LINES); // writes pixels on the frame buffer with the current drawing color
+       glVertex2i(x[k],y[k]);   // sets vertex  
+       glVertex2i(x[k+1],y[k+1]);
+      
+       
+}
+  glEnd();
+    glFlush();     // flushes the frame buffer to the screen
+}
+
+int main(){
+
+    glutInitWindowSize(640,480);   //sets the width and height of the window in pixels
+    glutInitWindowPosition(10,10);//sets the position of the window in pixels from top left corner 
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);//creates a single frame buffer of RGB color capacity.
+    glutCreateWindow("DDA Line Drawing");//creates the window as specified by the user as above.
+        
+    glClearColor(1, 1, 1, 0); // sets the backgraound color to white light
+    glClear(GL_COLOR_BUFFER_BIT); // clears the frame buffer and set values defined in glClearColor() function call 
+  
+    glutDisplayFunc(display);//links the display event with the display event handler(display)
+    glutMouseFunc(mouse);//keyboard event handler
+    glutMainLoop();//loops the current event
+}
+
+
+7.
+/*
+ * Chapter-7
+ * Example 1 of 1
+ * Animation
+ */
+
+#include <GL/glut.h>
+#include <math.h>
+
+int slices = 16;
+int stacks = 16;
+bool wireframe = TRUE;
+bool firstTime = TRUE;
+
+double v = 0; // velocity of ball
+double start = 3.0; // starting height of ball
+double a = -9.8; // acceleration due to gravity
+double ground = -3; // position of the ground
+double s = 0; // position of ball
+double last_t = 0;
+
+void myInit() {
+     // background colour is white
+    glClearColor(1,1,1,1);
+
+    // enable depth-buffering
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    // enable light source
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHTING);
+
+    // normalise surface normals
+    glEnable(GL_NORMALIZE);
+
+    // set lighting properties
+    const GLfloat light_ambient[]  = { 0.0, 0.0, 0.0, 1.0 };
+    const GLfloat light_diffuse[]  = { 1.0, 1.0, 1.0, 1.0 };
+    const GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    const GLfloat light_position[] = { 2.0, 5.0, 5.0, 0.0 };
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    // set material properties
+    const GLfloat mat_ambient[]    = { 0.7, 0.0, 0.0, 1.0 };
+    const GLfloat mat_diffuse[]    = { 0.8, 0.0, 0.0, 1.0 };
+    const GLfloat mat_specular[]   = { 1.0, 1.0, 1.0, 1.0 };
+    const GLfloat high_shininess[] = { 100.0 };
+    
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+
+    // set perspective projection
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glFrustum(-1.0, 1.0, -1.0, 1.0, 2.0, 100.0);
+}
+
+void myReshape (int w,int h) {
+    // resize the image when the window is resized
+    int R = 640 / 480;
+    if (R > w/h) // use global window aspect ratio
+        glViewport(0, 0, h, w/R);
+    else
+        glViewport(0, 0, h*R, h);
+}
+
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // update position/orientation of sphere
+    const double t = glutGet(GLUT_ELAPSED_TIME) / 1000.0;
+    const double angle = t*90.0;
+    if (firstTime) {
+        firstTime = FALSE;
+        last_t = t;
+    }
+    v += a * (t - last_t); // update velocity of ball
+    s += v * (t - last_t); // update position of ball
+    if (s <= ground) {
+        s = ground;
+        v = -0.95 * v; // ball hits the ground and bounces back up
+    }
+    last_t = t;
+    if ((fabs(v) < 0.01) && (fabs(s - ground) < 0.01))
+        s += start; // if ball has stopped bouncing, drop it again
+
+    // display ball
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslated(0,1.5 + s,-6);
+    glRotated(60,1,0,0);
+    glRotated(angle,0,0,1);
+    if (wireframe)
+        glutWireSphere(1,slices,stacks);
+    else
+        glutSolidSphere(1,slices,stacks);
+    glPopMatrix();
+
+    // update animation
+    glutSwapBuffers();
+}
+
+void key(unsigned char key, int x, int y)
+{
+    switch (key) 
+    {
+
+        case '+':
+            slices++;
+            stacks++;
+            break;
+
+        case '-':
+            if (slices>3 && stacks>3)
+            {
+                slices--;
+                stacks--;
+            }
+            break;
+        case 'w':
+            if (wireframe)
+                wireframe = FALSE;
+            else
+                wireframe = TRUE;
+    }
+
+    glutPostRedisplay();
+}
+
+void idle()
+{
+    glutPostRedisplay();
+}
+
+int main()
+{
+    glutInitWindowSize(640,480);
+    glutInitWindowPosition(10,10);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+    glutCreateWindow("Animation");
+
+    glutDisplayFunc(display);
+    glutReshapeFunc(myReshape);
+    glutKeyboardFunc(key);
+    glutIdleFunc(idle);
+
+    myInit();
+
+    glutMainLoop();
+
+}
+
+8.
+/* Example 2.9.solar.c: draw a simplified solar system */
+// by NAME,YEAR
+
+#include <stdio.h>
+#include <math.h>
+#include <GL/glut.h>
+
+int Height=600, Width=600;
+int depth=4, cnt=1; 
+
+float vdata[6][3] = {
+	{2.0, 0.0, 0.0}, {0.0, 5.0, 0.0}, {0.0, 0.0, 1.0},
+	{-1.0, 0.0, 0.0}, {0.0, -1.0, 0.0}, {0.0, 0.0, -1.0}
+};
+
+
+void normalize(float v[3]) {
+	float d = sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+
+	if (d == 0) {
+		printf("zero length vector");
+		return;
+	}
+	v[0] /= d;	v[1] /= d;	v[2] /= d;
+}
+
+void drawtriangle(float *v1, float *v2, float *v3)
+{
+	glBegin(GL_TRIANGLES);
+		glVertex3fv(v1);
+		glVertex3fv(v2);
+		glVertex3fv(v3);
+	glEnd();
+}
+
+
+void subdivideSphere(float *v1, float *v2, float *v3, long depth)
+{
+	float v12[3], v23[3], v31[3];
+	int i;
+
+	if (depth == 0) {
+		glColor3f(v1[0]*v1[0], v2[1]*v2[1], v3[2]*v3[2]);
+		drawtriangle(v1, v2, v3);
+		return;
+	}
+	for (i = 0; i < 3; i++) {
+		v12[i] = v1[i]+v2[i];
+		v23[i] = v2[i]+v3[i];
+		v31[i] = v3[i]+v1[i];
+	}
+	normalize(v12);
+	normalize(v23);
+	normalize(v31);
+	subdivideSphere(v1, v12, v31, depth - 1);
+	subdivideSphere(v2, v23, v12, depth - 1);
+	subdivideSphere(v3, v31, v23, depth - 1);
+	subdivideSphere(v12, v23, v31, depth - 1);
+}
+
+
+void drawSphere(void)
+
+{
+	subdivideSphere(vdata[0], vdata[1], vdata[2], depth);
+	subdivideSphere(vdata[0], vdata[2], vdata[4], depth);
+	subdivideSphere(vdata[0], vdata[4], vdata[5], depth);
+	subdivideSphere(vdata[0], vdata[5], vdata[1], depth);
+
+	subdivideSphere(vdata[3], vdata[1], vdata[5], depth);
+	subdivideSphere(vdata[3], vdata[5], vdata[4], depth);
+	subdivideSphere(vdata[3], vdata[4], vdata[2], depth);
+	subdivideSphere(vdata[3], vdata[2], vdata[1], depth);
+
+
+}
+
+
+void drawColorCoord(float xlen, float ylen, float zlen)
+{
+	// coordinate lines
+	glBegin(GL_LINES);
+		glColor3f(1,0,0);
+		glVertex3f(0,0,0);
+		glVertex3f(0,0,zlen);
+		glColor3f(0,1,0);
+		glVertex3f(0,0,0);
+		glVertex3f(0,ylen, 0);
+		glColor3f(0,0,1);
+		glVertex3f(0,0,0);
+		glVertex3f(xlen,0,0);
+	glEnd();
+
+	// coordinate labels: X, Y, Z
+	glPushMatrix();
+		glTranslatef(xlen,0.,0.);
+		glScalef(xlen/Width,xlen/Width,1);
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, 'X');
+	glPopMatrix();
+	glPushMatrix();
+		glColor3f(0,1,0);
+		glTranslatef(0., ylen,0.);
+		glScalef(ylen/Width,ylen/Width,1);
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, 'Y');
+	glPopMatrix();
+	glPushMatrix();
+		glColor3f(1,0,0);
+		glTranslatef(0., 0.,zlen);
+		glScalef(zlen/Width,zlen/Width,1);
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, 'Z');
+	glPopMatrix();
+}
+
+
+void drawSolar(float E, float e, float M, float m)
+{
+
+   drawColorCoord(Width/4, Width/4, Width/4);
+
+   glPushMatrix();
+		glRotatef(e, 0.0, 1.0, 0.0); // rotating around the "sun"; proceed angle
+		glTranslatef(E, 0.0, 0.0);
+		glPushMatrix();
+		glScalef(Width/20,Width/20,Width/20);
+			drawSphere();
+		glPopMatrix();
+ 		
+		glRotatef(m, 0.0, 1.0, 0.0); // rotating around the "earth"
+		glTranslatef(M, 0.0, 0.0);
+		drawColorCoord(Width/8, Width/8, Width/8);
+		glScalef(Width/40,Width/40,Width/40);
+		drawSphere();
+	glPopMatrix();
+ }
+
+
+void display(void)
+{ 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+    float angle;
+	cnt++;
+	angle = (float) cnt;
+	drawSolar(Width/4, angle, Width/12, angle);
+
+	glutSwapBuffers();
+}
+
+
+
+void Reshape(int w, int h)
+{
+    glClearColor (0.0, 0.0, 0.0, 1.0);
+
+	// enables depth test for hidden surface removal
+ 	glEnable(GL_DEPTH_TEST);
+
+	Width = w; Height = h; 
+
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    glOrtho(-w/2, w/2, -h/2, h/2, -w, w); 
+
+	glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
+}
+
+int main()
+{
+
+ 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(Width, Height);
+    glutCreateWindow("Example: press SPACE & another key");
+
+    glutReshapeFunc(Reshape); 
+    glutDisplayFunc(display);
+    glutIdleFunc(display);
+
+    glutMainLoop();
+}
+
+
+

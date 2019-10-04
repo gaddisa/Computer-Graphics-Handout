@@ -1,0 +1,572 @@
+1.
+#include<GL/Glut.h>
+#include<stdlib.h>
+
+float position=-1,angle=0,xpos=-1;
+
+void idle()
+  {
+                   
+angle+=5;   
+
+if(xpos<=1)
+xpos+=0.01;
+else
+xpos-=2;
+
+if (position<=1)
+position+=0.01;  
+else
+position-=2;
+
+glutPostRedisplay();   
+}   
+
+void display()
+
+{
+     glClearColor(1, 1, 1, 1.0); // white background
+     glClear(GL_COLOR_BUFFER_BIT);
+  
+	 glPushMatrix();
+     glTranslatef(xpos,0,0);//change 0 by position
+     glRotatef(angle,0,0,-1); 
+     
+       glColor3f(0,0,0); // black foreground
+     glScalef(0.1,0.1,0.1);  
+     glutSolidTorus(0.5, 2.0, 30, 30);//TO RENDER SOLID TORUS//glutWireTorus
+     glPopMatrix();
+ 
+     glutSwapBuffers();
+}
+
+int main()
+{
+    glutInitWindowSize(640,480);
+    glutInitWindowPosition(10,10);
+    glutInitDisplayMode(GLUT_DOUBLE );
+    glutCreateWindow("DDA Line Drawing");
+    
+    glutDisplayFunc(display);
+    glutIdleFunc(idle);//perform background processing tasks
+    
+    glutMainLoop();
+}
+
+
+2.
+#include <GL/glut.h>
+#include <stdlib.h>
+
+int xstart, ystart=480, xend, yend;
+float r,g,b;
+
+
+void idle()
+{
+    
+    xstart=300;
+    ystart=450;
+    
+    xend=rand ()%600;
+    yend= 10;
+    
+	r=(rand() % 9)/8;
+	g=(rand() % 9)/8;
+	b=(rand() % 9)/8;	
+	
+	glutPostRedisplay();
+     
+}
+
+void line()
+{   
+ glBegin(GL_LINES);
+   glVertex2f(xstart,ystart);
+   glVertex2f(xend,yend);
+ glEnd();  
+}
+
+void display(void)
+{
+   
+    glMatrixMode (GL_PROJECTION);//CHANGE BY GL_MODELVIEW
+    glLoadIdentity ();
+    gluOrtho2D(0, 640, 0,480); 
+    
+   	glLineWidth(2);    //width of the line
+    glColor3f(r, g, b);//current drawing color
+    
+line();
+glutSwapBuffers();
+
+}
+
+int main()
+{
+
+ 	glutInitDisplayMode(GLUT_DOUBLE);
+    glutInitWindowSize(640, 480);
+    glutCreateWindow("");
+    glClearColor (1.0, 1.0, 1.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glutDisplayFunc(display);
+    glutIdleFunc(idle);
+    
+    glutMainLoop();
+}
+
+
+3.
+
+#include <stdio.h>
+#include <math.h>
+#include <GL/glut.h>
+
+int Height=400, Width=400;
+int depth=0, circleRadius=2, cnt=1; 
+
+
+float vdata[4][3] = {  {1.0, 0.0, 0.0},  {0.0, 1.0, 0.0}, 
+                       {-1.0, 0.0, 0.0}, {0.0, -1.0, 0.0}
+                    };
+
+void normalize(float v[3]) {
+	float d = (v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+
+	if (d == 0) {
+		printf("zero length vector");
+		return;
+	}
+	v[0] /= d;	v[1] /= d;	v[2] /= d;
+}
+
+void drawtriangle(float *v1, float *v2, float *v3)
+{
+	glBegin(GL_TRIANGLES);
+		glVertex3fv(v1);
+		glVertex3fv(v2);
+		glVertex3fv(v3);
+	glEnd();
+}
+
+void subdivideCircle(int radius, float *v1, float *v2, int depth)
+{
+	float v11[3], v22[3], v00[3] = {0, 0, 0}, v12[3];
+	int i;
+
+	if (depth == 0) {
+		glColor3f(v1[0]*v1[0], v1[1]*v1[1], v1[2]*v1[2]);
+
+		for (i=0; i<3; i++) {
+			v11[i] = v1[i]*radius;
+			v22[i] = v2[i]*radius;
+		}
+		drawtriangle(v11, v22, v00);
+
+		return;
+	}
+		
+	v12[0] = v1[0]+v2[0]; 
+	v12[1] = v1[1]+v2[1];
+	v12[2] = v1[2]+v2[2];
+
+
+	normalize(v12);
+
+	subdivideCircle(radius, v1, v12, depth - 1);
+	subdivideCircle(radius, v12, v2, depth - 1);
+}
+
+
+void drawCircle(int circleRadius)
+// draw a circle with center at the origin in xy plane
+{
+
+	subdivideCircle(circleRadius, vdata[0], vdata[1], depth);
+	subdivideCircle(circleRadius, vdata[1], vdata[2], depth);
+	subdivideCircle(circleRadius, vdata[2], vdata[3], depth);
+	subdivideCircle(circleRadius, vdata[3], vdata[0], depth);	
+}
+
+
+void display1(void)
+{ 
+	if (circleRadius>Width/2 || circleRadius==1) 
+	{
+		cnt=-cnt; 
+		depth++;
+		depth = depth % 5;
+	}
+
+	circleRadius+=cnt;
+
+	glClear(GL_COLOR_BUFFER_BIT);
+	drawCircle(circleRadius);
+
+	glutSwapBuffers();
+}
+
+
+
+static void Reshape(int w, int h)
+{
+    glClearColor (0.0, 0.0, 0.5, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+//glutInitWindowSize(Width/2, Height/2);
+	Width = w; Height = h; 
+
+    glViewport (0, 0, Width, Height);
+
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    glOrtho(-Width/2, Width/2, -Height/2, Height/2, -1.0, 1.0); 
+}
+
+int main()
+{
+ 	glutInitDisplayMode(GLUT_DOUBLE);
+    
+    glutCreateWindow("Example 1.5.circle.c: press SPACE & another key");
+
+    glutReshapeFunc(Reshape); 
+    glutDisplayFunc(display1);
+    glutIdleFunc(display1);
+
+    glutMainLoop();
+}
+
+4.
+
+#include<GL/Glut.h>
+#include<stdlib.h>
+
+float position=-1,angle=5,xpos=-1;
+
+void idle()
+  {
+                   
+angle+=5;   
+
+if(xpos<=1)
+xpos+=0.01;
+else
+xpos-=2;
+
+if (position<=1)
+position+=0.01;  
+else
+position-=2;
+
+glutPostRedisplay();   
+}   
+
+void display()
+
+{
+     glClearColor(1, 1, 1, 1.0); // white background
+     glClear(GL_COLOR_BUFFER_BIT);
+  
+	 glPushMatrix();
+     glTranslatef(xpos,0,0);
+     glRotatef(angle,0,0,-1); 
+     
+  
+     glColor3f(0,0,0); // black foreground
+     glScalef(0.1,0.1,0.1);  
+     glutSolidTorus(0.5, 2.0, 30, 30);
+     glPopMatrix();
+ 
+     glutSwapBuffers();
+}
+
+int main()
+{
+    glutInitWindowSize(640,480);
+    glutInitWindowPosition(10,10);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutCreateWindow("DDA Line Drawing");
+    
+    glutDisplayFunc(display);
+    glutIdleFunc(idle);
+    
+    glutMainLoop();
+}
+
+
+5.
+
+
+#include <GL/glut.h>
+#include <stdlib.h>
+
+int xstart, ystart=480, xend, yend,angle;
+float r,g,b;
+
+
+void idle()
+{
+    angle+=2;
+    xstart=300;
+    ystart=450;
+    
+    xend=rand ()%600;
+    yend= 10;
+    
+	r=(rand() % 9)/8;
+	g=(rand() % 9)/8;
+	b=(rand() % 9)/8;	
+	
+	glutPostRedisplay();
+     
+}
+
+void line()
+{   
+ glBegin(GL_LINES);
+   glVertex2f(xstart,ystart);
+   glVertex2f(xend,yend);
+ glEnd();  
+}
+
+void display(void)
+{
+   
+    glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
+    gluOrtho2D(0, 640, 0,480); 
+    
+   	glLineWidth(2);    //width of the line
+    glColor3f(r, g, b);//current drawing color
+    
+line();
+glutSwapBuffers();
+
+}
+
+int main()
+{
+
+ 	glutInitDisplayMode(GLUT_DOUBLE);
+    glutInitWindowSize(640, 480);
+    glutCreateWindow("");
+    glClearColor (1.0, 1.0, 1.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glutDisplayFunc(display);
+    glutIdleFunc(idle);
+    
+    glutMainLoop();
+}
+
+6.
+/*Chapter-3
+* Example 5 of 6
+* 3D - sphere model
+*/
+
+#include <stdio.h>
+#include <math.h>
+#include <GL/glut.h>
+
+int depth=6;
+float angle=1;
+
+float vdata[6][3] = {{1, 0, 0}, 
+                     {0, 1, 0}, 
+                     {0, 0, 1},
+	                 {-1, 0, 0}, 
+                     {0, -1, 0}, 
+                     {0, 0, -1}
+                    };
+void normalize(float v[3]) {
+	float d = sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+	v[0] /= d;	v[1] /= d;	v[2] /= d;
+}
+void subdivideSphere(float *v1, float *v2, float *v3, long depth)
+{
+	float v12[3], v23[3], v31[3];
+	if (depth == 0) {
+		glColor3f(v1[0]*v1[0], v2[1]*v2[1], v3[2]*v3[2]);
+	glBegin(GL_TRIANGLES);
+		glVertex3fv(v1);
+		glVertex3fv(v2);
+		glVertex3fv(v3);
+	glEnd();
+	
+		return;
+	}
+	for (int i = 0; i < 3; i++) {
+		v12[i] = v1[i]+v2[i];
+		v23[i] = v2[i]+v3[i];
+		v31[i] = v1[i]+v3[i];
+	}
+	normalize(v12);
+	normalize(v23);
+	normalize(v31);
+	subdivideSphere(v1, v12, v31, depth - 1);
+	subdivideSphere(v2, v23, v12, depth - 1);
+	subdivideSphere(v3, v31, v23, depth - 1);
+	subdivideSphere(v23,v23, v31,  depth - 1);
+}
+void drawSphere()
+{
+	subdivideSphere(vdata[0], vdata[1], vdata[2], 5);
+	subdivideSphere(vdata[0], vdata[2], vdata[4], 5);
+    subdivideSphere(vdata[0], vdata[4], vdata[5], 5);
+	subdivideSphere(vdata[0], vdata[5], vdata[1], 5);
+
+	subdivideSphere(vdata[3], vdata[1], vdata[5], 5);
+	subdivideSphere(vdata[3], vdata[5], vdata[4], 5);
+	subdivideSphere(vdata[3], vdata[4], vdata[2], 5);
+	subdivideSphere(vdata[3], vdata[2], vdata[1], 5);
+}
+void display()
+{ 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor (0.0, 0.0, 0.4, 1.0);
+    
+ 	glEnable(GL_DEPTH_TEST);// enables depth test for hidden surface removal
+ 	
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    glOrtho(-300, 300, -300, 300, -300, 300); 
+	glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
+    
+    angle++;
+        glPushMatrix();
+		glRotatef(angle, 0.0, 1.0, 0.0); 
+		glTranslatef(10, 0.0, 0.0);
+		glScalef(200,200,200);
+		drawSphere();
+     	glPopMatrix();
+     	
+	glutSwapBuffers();
+}
+int main(){   
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(600, 600);
+    glutCreateWindow("Example: press SPACE & another key");
+
+    glutDisplayFunc(display);
+    glutIdleFunc(display);
+    glutMainLoop();
+}
+
+
+7.
+
+/*chapter-3
+*Example 6 of 6
+*a simple solar system 
+*/
+
+#include <math.h>
+#include <GL/glut.h>
+
+int Height=600, Width=600;
+int depth=4;
+float angle=2;
+
+float vdata[6][3] = {
+	{1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0},
+	{-1.0, 0.0, 0.0}, {0.0, -1.0, 0.0}, {0.0, 0.0, -1.0}
+};
+void normalize(float v[3]) {
+	float d = sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+
+	v[0] /= d;	v[1] /= d;	v[2] /= d;
+}
+void subdivideSphere(float *v1, float *v2, float *v3, long depth)
+{
+	float v12[3], v23[3], v31[3];
+	int i;
+
+	if (depth == 0) {
+		glColor3f(v1[0]*v1[0], v2[1]*v2[1], v3[2]*v3[2]);
+		
+	glBegin(GL_TRIANGLES);
+		glVertex3fv(v1);
+		glVertex3fv(v2);
+		glVertex3fv(v3);
+	glEnd();
+		return;
+	}
+	for (i = 0; i < 3; i++) {
+		v12[i] = v1[i]+v2[i];
+		v23[i] = v2[i]+v3[i];
+		v31[i] = v3[i]+v1[i];
+	}
+	normalize(v12);
+	normalize(v23);
+	normalize(v31);
+	subdivideSphere(v1, v12, v31, depth - 1);
+	subdivideSphere(v2, v23, v12, depth - 1);
+	subdivideSphere(v3, v31, v23, depth - 1);
+	subdivideSphere(v12, v23, v31, depth - 1);
+}
+void drawSphere(void)
+{
+	subdivideSphere(vdata[0], vdata[1], vdata[2], depth);
+	subdivideSphere(vdata[0], vdata[2], vdata[4], depth);
+	subdivideSphere(vdata[0], vdata[4], vdata[5], depth);
+	subdivideSphere(vdata[0], vdata[5], vdata[1], depth);
+
+	subdivideSphere(vdata[3], vdata[1], vdata[5], depth);
+	subdivideSphere(vdata[3], vdata[5], vdata[4], depth);
+	subdivideSphere(vdata[3], vdata[4], vdata[2], depth);
+	subdivideSphere(vdata[3], vdata[2], vdata[1], depth);
+}
+void drawSolar(float angle1, float angle2, float distance1, float angle3)
+{
+   glPushMatrix();
+		glRotatef(angle, 0.0, 1.0, 0.0); // rotating around the "sun";
+		glTranslatef(20, 0.0, 0.0);
+		glScalef(200,200,200);
+		drawSphere();
+		glPopMatrix();
+	glPopMatrix();
+ }
+void display(void)
+{ 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	angle+=0.5;
+	drawSolar(150, angle, 50, angle);
+
+	glutSwapBuffers();
+}
+void Reshape(int w, int h)
+{
+    glClearColor (0.0, 0.0, 0.0, 1.0);
+
+	// enables depth test for hidden surface removal
+ 	glEnable(GL_DEPTH_TEST);
+
+	Width = w; Height = h; 
+
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    glOrtho(-300, 300, -300, 300, -600, 600); 
+
+	glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
+}
+
+int main()
+{
+
+ 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(600, 600);
+    glutCreateWindow("3D-solid sphere");
+
+    glutReshapeFunc(Reshape); 
+    glutDisplayFunc(display);
+    glutIdleFunc(display);
+
+    glutMainLoop();
+}
+
+
+
+

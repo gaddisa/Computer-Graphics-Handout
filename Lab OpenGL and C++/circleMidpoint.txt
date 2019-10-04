@@ -1,0 +1,65 @@
+// an openGL  program to draw a circle using midpoint circle drawing
+//by Gaddisa O. 2016
+#include<GL/glut.h>
+void circleMidPoint() 
+{
+int xCenter = 400 ;
+int yCenter = 200;
+int radius = 100; 
+ 
+    int x = 0;    
+    int y = radius;
+    int p = 1 - radius;//5/4 is rounded to 1 for integer radius
+     
+     while(x<y)  {// iterates to draw the first sector
+         x++;
+         if(p < 0)// the mid point is inside the circle
+              p += 2*x + 1;
+         else {// the mid point is outside or at the circle
+              y--;
+              p += 2 * (x - y) + 1;
+         }  
+     glBegin(GL_POINTS);
+         glVertex2i(xCenter + x, yCenter + y);
+         glVertex2i(xCenter - x, yCenter + y);
+         glVertex2i(xCenter + x, yCenter - y);
+         glVertex2i(xCenter - x, yCenter - y);
+         glVertex2i(xCenter + y, yCenter + x);
+         glVertex2i(xCenter - y, yCenter + x);
+         glVertex2i(xCenter + y, yCenter - x);
+         glVertex2i(xCenter - y, yCenter - x);
+     glEnd();
+     }   
+     // OPTIONAL:-> center of the circle
+     glBegin(GL_POINTS);
+         glVertex2i(xCenter,yCenter);
+     glEnd();     
+} 
+void display()
+{
+     glClearColor(0.0,0.0,0.0,1.0);     // white background
+     glClear(GL_COLOR_BUFFER_BIT);     // clear the screen  
+     glColor3f(1.0,1.0,0.0);          // yellow foreground
+     glPointSize(5.0);               // size of points to be drawin (in pixel)
+    
+     //establish a coordinate system for the image
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0.0, 640.0, 0.0, 480.0);
+      
+     circleMidPoint();
+     glFlush(); // send all output to the display
+}  
+
+int main()
+{
+    glutInitWindowSize(640,480); // set the size of the window
+    glutInitWindowPosition(10,10); // the position of the top-left of window
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    
+    glutCreateWindow("Midpoint Circle Drawing Algorithm By Gaddisa");
+
+    glutDisplayFunc(display); // set the GLUT display callback function
+    glutMainLoop(); // enter the GL event loop
+
+}  

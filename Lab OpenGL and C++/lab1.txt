@@ -1,0 +1,258 @@
+an openGL program to display 5 point on the screen
+programmed by Gaddisa O.
+
+1.
+	#include <GL/glut.h>
+	void myInit(void) {
+    	glClearColor(1.0, 1.0, 1.0, 0.0); // white background
+    	glColor3f(1,0,0); // red foreground
+    	glPointSize(4.0); // size of points to be drawn
+
+    	// establish a coordinate system for the image
+    	glMatrixMode(GL_PROJECTION);
+    	glLoadIdentity();
+    	gluOrtho2D(0.0, 640.0, 0.0, 480.0);//specifies the coordinate system OpenGL assumes as it draws the
+		//final image and how the image gets mapped to the screen
+	}	
+
+	/* GLUT display callback handler */
+	void display(void)
+	{
+    	glClear(GL_COLOR_BUFFER_BIT); // Clear Screen
+    	glBegin(GL_POINTS); // draw 3 points
+      	glVertex2i(100,50);
+      	glVertex2i(100,130);
+      	glVertex2i(150,130);
+      	glVertex2i(200,250);
+      	glVertex2i(150,250);
+    	glEnd();
+    	glFlush(); // send all output to the display
+	}
+
+	/* Program entry point */
+	int main()
+	{
+    	//glutInit(&argc, argv); // initialise the glut library
+    	glutInitWindowSize(640,480); // set size of the window
+    	
+    	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    	glutCreateWindow("computer graphics");
+    	glutDisplayFunc(display); // set display callback
+    	myInit(); // perform other initialisation
+    	glutMainLoop(); // enter the GL event loop
+    	return 0;
+	}
+2.
+
+		to demonstrate line drawing
+	#include <GL/glut.h>
+	void me() 
+	{
+    	glClearColor(1.0, 1.0, 1.0, 0.0); // white background
+    	glColor3f(0,0,0); // black foreground
+    	glPointSize(4.0); // size of points to be drawn
+
+    	// establish a coordinate system for the image
+    	glMatrixMode(GL_PROJECTION);
+   	 glLoadIdentity();
+    	gluOrtho2D(0.0, 640.0, 0.0, 480.0);
+	}
+
+	/* GLUT display callback handler */
+	void display(void)
+	{
+    	glClear(GL_COLOR_BUFFER_BIT); // Clear Screen
+	glLineWidth(4.0);
+    	glBegin(GL_LINES); // draw 3 points
+      	glVertex2i(50,100);
+      	glVertex2i(100,150);
+     	 glVertex2i(150,150);
+      	glVertex2i(200,250);
+      	glVertex2i(200,250);
+     
+    	glEnd();
+    	glFinish(); // send all output to the display
+	}
+
+	/* Program entry point */
+	int main()
+	{
+    	
+    	glutInitWindowSize(640,480); // set size of the window
+    
+    	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    	glutCreateWindow("computer graphics");
+    	glutDisplayFunc(display); // set display callback
+    	me(); // perform other initialisation
+    	glutMainLoop(); // enter the GL event loop
+    	return 0;
+	}
+3.
+ TO SHOW DRAWING OF TRIANGLES
+	#include <GL/glut.h>
+	void me(void) {
+   	 glClearColor(1.0, 1.0, 1.0, 0.0); // white background
+    	glColor3f(0,0,0); // black foreground
+    	glPointSize(4.0); 
+
+   	 // establish a coordinate system for the image
+    	glMatrixMode(GL_PROJECTION);
+    	glLoadIdentity();
+    	gluOrtho2D(0.0, 640.0, 0.0, 480.0);
+	}
+
+	/* GLUT display callback handler */
+	void display(void)
+	{
+    	glClear(GL_COLOR_BUFFER_BIT); // Clear Screen
+    	glBegin(GL_TRIANGLES); 
+     	 glVertex2i(50,100);
+      	glVertex2i(100,150);
+      	glVertex2i(150,150);
+      	glVertex2i(300,350);
+      	glVertex2i(400,450);
+       	glVertex2i(450,450);
+     
+   	 glEnd();
+    	glFinish(); // send all output to the display
+	}
+
+	
+	int main()
+	{
+    	    glutInitWindowSize(640,480); 
+    	//glutInitWindowPosition(10,10); 
+    	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    	glutCreateWindow("SAMPLE TRIANGLES");
+    	glutDisplayFunc(display); 
+    	me(); 
+    	glutMainLoop(); // enter the GL event loop
+    	return 0;
+	}
+4. TO SHOW LINE STRIP
+	#include <GL/glut.h>
+	void me(void) {
+    	glClearColor(1.0, 1.0, 1.0, 0.0); // white background
+    	glColor3f(0,0,0); // black foreground
+    	glPointSize(4.0); // size of points to be drawn
+
+    	// establish a coordinate system for the image
+    	glMatrixMode(GL_PROJECTION);
+    	glLoadIdentity();
+   	 gluOrtho2D(0.0, 640.0, 0.0, 480.0);
+	}
+
+	/* GLUT display callback handler */
+	void display(void)
+	{
+   	 glClear(GL_COLOR_BUFFER_BIT); // Clear Screen
+    	glLineWidth(4.0);
+    		glBegin(GL_LINE_STRIP);
+	 		glVertex2f(100.0, 200.0);
+			glVertex2f(150.0, 200.0);
+ 			glVertex2f(150.0, 250.0);
+ 			glVertex2f(200.0, 250.0);
+	glEnd();
+
+    	glFinish(); // send all output to the display
+	}
+
+	int main()
+	{
+   	 
+    	glutInitWindowSize(640,480); // set size of the window
+    	
+    	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    	glutCreateWindow("computer graphics");
+    	glutDisplayFunc(display); 
+    	me(); // perform other initialisation
+    	glutMainLoop(); 
+    	return 0;
+	}
+5.LOOK THE EFFECT BY CHANGING THE SYMBOLIC CONSTANT LINES_STRIP TO LINES_LOOP 
+6. TO SHOW HOW TO DRAW A POLYGON
+	#include <GL/glut.h>
+	void MYInt(void) {
+   	 glClearColor(1.0, 1.0, 1.0, 0.0); // white background
+    	glColor3f(1,1,0); // YELLOW foreground
+    	glPointSize(4.0); // size of points to be drawn
+
+   	 // establish a coordinate system for the image
+    	glMatrixMode(GL_PROJECTION);
+    	glLoadIdentity();
+    	gluOrtho2D(0.0, 640.0, 0.0, 480.0);
+	}
+
+	/* GLUT display callback handler */
+	void display(void)
+	{
+
+    	glClear(GL_COLOR_BUFFER_BIT); // Clear Screen
+    
+    		glBegin(GL_POLYGON);
+	 		glVertex2f(100.0, 200.0);
+			glVertex2f(200.0, 200.0);
+ 			glVertex2f(200.0, 150.0);
+ 			glVertex2f(100.0, 150.0);
+	glEnd();
+
+   	 glFinish(); // send all output to the display
+	}
+
+	/* Program entry point */
+	int main()
+	{
+    	
+    	glutInitWindowSize(640,480); // set size of the window
+    	
+   	 glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    	glutCreateWindow("polygon");
+    	glutDisplayFunc(display); // set display callback
+    	MYInt(); 
+    	glutMainLoop(); 
+    	return 0;
+	}
+
+7.WRITE AN OPENGL PROGRAM TO DISPLAY LIKE A STAR SHAPE
+#include <GL/glut.h>
+void me(void) {
+    glClearColor(1.0, 1.0, 1.0, 0.0); // white background
+    glColor3f(1,0,0); // YELLOW foreground
+    glPointSize(4.0); // size of points to be drawn
+
+    // establish a coordinate system for the image
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0.0, 640.0, 0.0, 480.0);
+}
+
+/* GLUT display callback handler */
+void display(void)
+{
+
+    glClear(GL_COLOR_BUFFER_BIT); // Clear Screen
+    //glLineWidth(4.0);
+    	glBegin(GL_LINE_LOOP);
+	 	glVertex2i(50, 100);
+		glVertex2i( 100,200 );
+ 		glVertex2i(150,100);
+ 		glVertex2i(50,175 );
+ 		glVertex2i(200,175 );
+glEnd();
+
+    glFinish(); // send all output to the display
+}
+
+/* Program entry point */
+int main()
+{
+    //glutInit(&argc, argv); // initialise the glut library
+    glutInitWindowSize(640,480); // set size of the window
+    //glutInitWindowPosition(10,10); // position of window
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutCreateWindow("computer graphics");
+    glutDisplayFunc(display); // set display callback
+    me(); // perform other initialisation
+    glutMainLoop(); // enter the GL event loop
+    return 0;
+}

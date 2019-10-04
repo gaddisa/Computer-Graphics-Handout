@@ -1,0 +1,60 @@
+//programmed by Gaddisa O.
+#include <stdlib.h>
+#include <math.h>
+#include <GL/glut.h>
+void line (int xstart,int ystart,int xend,int yend)
+{ 
+    int x;
+	float m, y;
+
+    m = (float) (yend-ystart)/(xend-xstart);
+
+    x=xstart; y= ystart;
+ 
+    while (x<xend+1) { 
+        // write a pixel into framebuffer	
+		    glBegin(GL_POINTS);
+			glVertex2f (x,y);	
+		glEnd();
+   
+		x++; y+=m;/* next pixel's position */
+    }
+}
+
+
+void display(void)
+{
+    	// set the background color to black
+
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    gluOrtho2D(0, 68, 0, 48); 
+     
+     
+	int xstart, ystart, xend, yend;
+
+	// generate a random line with x0<xn;
+	xstart = (rand() % 640); 
+	ystart = rand() % 480; 
+	xend =  (rand() % 640); 
+	yend = rand() % 480; 
+
+	// draw green lines
+	glColor3f(0, 1, 0);
+	line(xstart, ystart, xend, yend);
+	glFlush();
+}
+
+int main()
+{
+
+ 	glutInitDisplayMode(GLUT_SINGLE);
+    glutInitWindowSize(640, 480);
+    glutCreateWindow(" randomly generated lines");
+    glClearColor (0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glutDisplayFunc(display);
+    glutIdleFunc(display);
+
+    glutMainLoop();
+}
